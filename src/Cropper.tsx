@@ -25,7 +25,8 @@ export type CropperProps = {
   aspect: number
   minZoom: number
   maxZoom: number
-  cropShape: 'rect' | 'round'
+  cropShape: 'rect' | 'round',
+  borderRadius: string,
   cropSize?: Size
   objectFit?: 'contain' | 'horizontal-cover' | 'vertical-cover' | 'auto-cover'
   showGrid?: boolean
@@ -87,6 +88,7 @@ class Cropper extends React.Component<CropperProps, State> {
     maxZoom: MAX_ZOOM,
     minZoom: MIN_ZOOM,
     cropShape: 'rect' as const,
+    borderRadius: '',
     objectFit: 'contain' as const,
     showGrid: true,
     style: {},
@@ -138,7 +140,7 @@ class Cropper extends React.Component<CropperProps, State> {
         this.currentWindow.addEventListener('resize', this.computeSizes)
       }
       this.props.zoomWithScroll &&
-        this.containerRef.addEventListener('wheel', this.onWheel, { passive: false })
+      this.containerRef.addEventListener('wheel', this.onWheel, { passive: false })
       this.containerRef.addEventListener('gesturestart', this.onGestureStart as EventListener)
     }
 
@@ -327,13 +329,13 @@ class Cropper extends React.Component<CropperProps, State> {
             renderedMediaSize =
               containerAspect > mediaAspect
                 ? {
-                    width: this.containerRect.height * mediaAspect,
-                    height: this.containerRect.height,
-                  }
+                  width: this.containerRect.height * mediaAspect,
+                  height: this.containerRect.height,
+                }
                 : {
-                    width: this.containerRect.width,
-                    height: this.containerRect.width / mediaAspect,
-                  }
+                  width: this.containerRect.width,
+                  height: this.containerRect.width / mediaAspect,
+                }
             break
           case 'horizontal-cover':
             renderedMediaSize = {
@@ -351,13 +353,13 @@ class Cropper extends React.Component<CropperProps, State> {
             renderedMediaSize =
               naturalWidth > naturalHeight
                 ? {
-                    width: this.containerRect.width,
-                    height: this.containerRect.width / mediaAspect,
-                  }
+                  width: this.containerRect.width,
+                  height: this.containerRect.width / mediaAspect,
+                }
                 : {
-                    width: this.containerRect.height * mediaAspect,
-                    height: this.containerRect.height,
-                  }
+                  width: this.containerRect.height * mediaAspect,
+                  height: this.containerRect.height,
+                }
             break
         }
       } else {
@@ -381,13 +383,13 @@ class Cropper extends React.Component<CropperProps, State> {
       const cropSize = this.props.cropSize
         ? this.props.cropSize
         : getCropSize(
-            this.mediaSize.width,
-            this.mediaSize.height,
-            this.containerRect.width,
-            this.containerRect.height,
-            this.props.aspect,
-            this.props.rotation
-          )
+          this.mediaSize.width,
+          this.mediaSize.height,
+          this.containerRect.width,
+          this.containerRect.height,
+          this.props.aspect,
+          this.props.rotation
+        )
 
       if (
         this.state.cropSize?.height !== cropSize.height ||
@@ -503,12 +505,12 @@ class Cropper extends React.Component<CropperProps, State> {
 
       const newPosition = this.props.restrictPosition
         ? restrictPosition(
-            requestedPosition,
-            this.mediaSize,
-            this.state.cropSize,
-            this.props.zoom,
-            this.props.rotation
-          )
+          requestedPosition,
+          this.mediaSize,
+          this.state.cropSize,
+          this.props.zoom,
+          this.props.rotation
+        )
         : requestedPosition
       this.props.onCropChange(newPosition)
     })
@@ -608,12 +610,12 @@ class Cropper extends React.Component<CropperProps, State> {
 
       const newPosition = this.props.restrictPosition
         ? restrictPosition(
-            requestedPosition,
-            this.mediaSize,
-            this.state.cropSize,
-            newZoom,
-            this.props.rotation
-          )
+          requestedPosition,
+          this.mediaSize,
+          this.state.cropSize,
+          newZoom,
+          this.props.rotation
+        )
         : requestedPosition
 
       this.props.onCropChange(newPosition)
@@ -629,12 +631,12 @@ class Cropper extends React.Component<CropperProps, State> {
     // this is to ensure the crop is correctly restricted after a zoom back (https://github.com/ValentinH/react-easy-crop/issues/6)
     const restrictedPosition = this.props.restrictPosition
       ? restrictPosition(
-          this.props.crop,
-          this.mediaSize,
-          this.state.cropSize,
-          this.props.zoom,
-          this.props.rotation
-        )
+        this.props.crop,
+        this.mediaSize,
+        this.state.cropSize,
+        this.props.zoom,
+        this.props.rotation
+      )
       : this.props.crop
     return computeCroppedArea(
       restrictedPosition,
@@ -676,12 +678,12 @@ class Cropper extends React.Component<CropperProps, State> {
 
     const newPosition = this.props.restrictPosition
       ? restrictPosition(
-          this.props.crop,
-          this.mediaSize,
-          this.state.cropSize,
-          this.props.zoom,
-          this.props.rotation
-        )
+        this.props.crop,
+        this.mediaSize,
+        this.state.cropSize,
+        this.props.zoom,
+        this.props.rotation
+      )
       : this.props.crop
 
     this.props.onCropChange(newPosition)
@@ -698,6 +700,7 @@ class Cropper extends React.Component<CropperProps, State> {
       rotation,
       zoom,
       cropShape,
+      borderRadius,
       showGrid,
       style: { containerStyle, cropAreaStyle, mediaStyle },
       classes: { containerClassName, cropAreaClassName, mediaClassName },
@@ -722,9 +725,9 @@ class Cropper extends React.Component<CropperProps, State> {
               objectFit === 'horizontal-cover' && 'reactEasyCrop_Cover_Horizontal',
               objectFit === 'vertical-cover' && 'reactEasyCrop_Cover_Vertical',
               objectFit === 'auto-cover' &&
-                (this.mediaSize.naturalWidth > this.mediaSize.naturalHeight
-                  ? 'reactEasyCrop_Cover_Horizontal'
-                  : 'reactEasyCrop_Cover_Vertical'),
+              (this.mediaSize.naturalWidth > this.mediaSize.naturalHeight
+                ? 'reactEasyCrop_Cover_Horizontal'
+                : 'reactEasyCrop_Cover_Vertical'),
               mediaClassName
             )}
             {...(mediaProps as React.ImgHTMLAttributes<HTMLElement>)}
@@ -749,9 +752,9 @@ class Cropper extends React.Component<CropperProps, State> {
                 objectFit === 'horizontal-cover' && 'reactEasyCrop_Cover_Horizontal',
                 objectFit === 'vertical-cover' && 'reactEasyCrop_Cover_Vertical',
                 objectFit === 'auto-cover' &&
-                  (this.mediaSize.naturalWidth > this.mediaSize.naturalHeight
-                    ? 'reactEasyCrop_Cover_Horizontal'
-                    : 'reactEasyCrop_Cover_Vertical'),
+                (this.mediaSize.naturalWidth > this.mediaSize.naturalHeight
+                  ? 'reactEasyCrop_Cover_Horizontal'
+                  : 'reactEasyCrop_Cover_Vertical'),
                 mediaClassName
               )}
               {...mediaProps}
@@ -784,6 +787,11 @@ class Cropper extends React.Component<CropperProps, State> {
               showGrid && 'reactEasyCrop_CropAreaGrid',
               cropAreaClassName
             )}
+            {...borderRadius !=='' && {
+              style: {
+                borderRadius
+              }
+            }}
           />
         )}
       </div>
